@@ -7,9 +7,40 @@ using namespace std;
 
 #include "Class.h"
 
+Airport::Airport(int maxSize)
+{
+    LinerPark = new Liner[maxSize];
+    for (int i = 0; i < maxSize; i++)
+    {
+        LinerPark[i] = NULL;
+    }
+    avialinerCount = 0;
+    MaxSize = maxSize;
+}
+
+Airport::~Airport()
+{
+    for (int i = 0; i < MaxSize; i++)
+    {
+        if (LinerPark[i] != NULL)
+        {
+            delete LinerPark[i];
+            LinerPark[i] = NULL;
+        }
+    }
+    delete[] LinerPark;
+}
+
+void Airport::AddPlane(Liner NewLiner)
+{
+    LinerPark[avialinerCount++] = NewLiner;
+}
+
+
+
 int main()
 {
-    std::cout << "Hello World!\n";
+    
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"

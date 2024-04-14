@@ -36,10 +36,13 @@ public:
 	int MaxAmountOfFuel() { return maxFuel; }
 	LinerType GetType() const { return Type; }
 	aviacompany GetCompany() const { return Company;  }
+	void Repairing() { NeedRepair = false; }
 	virtual void Takeoff() = 0;
 
 
 };
+
+typedef Avialiner* Liner;
 
 class Airbus : public Avialiner
 {
@@ -62,7 +65,21 @@ public:
 	void Takeoff() { wcout << "Самолет взлетел" << endl; };
 };
 
+class Airport
+{
+private:
+	int avialinerCount;
+	int MaxSize;
+	Liner* LinerPark;
 
+public:
+	Airport(int size);
+	virtual ~Airport();
+	void AddPlane(Liner NewLiner);
+	int GetCount() const { return avialinerCount; }
+	Liner GetByindex(int index) const { return LinerPark[index]; }
+
+};
 
 
 
