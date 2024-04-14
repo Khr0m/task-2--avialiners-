@@ -17,12 +17,14 @@ enum class aviacompany : int
 	Unknown = -1
 };
 
+//семейство объектов
+
 class Avialiner
 {
 protected:
 	bool NeedRepair;
-	bool InFly;
-	int Fuel;
+	//bool InFly;
+	//int Fuel;
 	int maxFuel;
 	aviacompany Company;
 	LinerType Type;
@@ -31,12 +33,12 @@ protected:
 
 public:
 	bool IsNeedRepair() const {return NeedRepair;  }
-	bool IsInFly() const { return InFly;  }
-	int AmountOfFuel() { return Fuel;  }
+	//bool IsInFly() const { return InFly;  }
+	//int AmountOfFuel() { return Fuel;  }
 	int MaxAmountOfFuel() { return maxFuel; }
 	LinerType GetType() const { return Type; }
 	aviacompany GetCompany() const { return Company;  }
-	void Repairing() { NeedRepair = false; }
+	void Repairing() { NeedRepair = false; wcout << L"Самолет починен" << endl;}
 	virtual void Takeoff() = 0;
 
 
@@ -58,14 +60,14 @@ public:
 	void Takeoff() { wcout << "Самолет взлетел" << endl; };
 };
 
-class MC_21 : public Avialiner
+class Superjet : public Avialiner
 {
 public:
-	MC_21(aviacompany company, LinerType type) : Avialiner() { Company = company; Type = type; }
+	Superjet(aviacompany company, LinerType type) : Avialiner() { Company = company; Type = type; }
 	void Takeoff() { wcout << "Самолет взлетел" << endl; };
 };
 
-class Airport
+class Airport // контейнер
 {
 private:
 	int avialinerCount;

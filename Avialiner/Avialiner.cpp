@@ -7,6 +7,17 @@ using namespace std;
 
 #include "Class.h"
 
+Avialiner::Avialiner()
+{
+    if ((rand() % (100 - 0 + 1) + 100) < 87)
+        NeedRepair = false;
+    else NeedRepair = true;
+   // InFly = false;
+   // Fuel = 0;
+    Company = aviacompany::Unknown;
+    Type = LinerType::Unknown;
+}
+
 Airport::Airport(int maxSize)
 {
     LinerPark = new Liner[maxSize];
@@ -40,7 +51,7 @@ void Airport::AddPlane(Liner NewLiner)
 
 int main()
 {
-    
+    setlocale(LC_ALL, "Russian");
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
