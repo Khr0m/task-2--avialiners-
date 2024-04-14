@@ -3,6 +3,10 @@
 
 #include <iostream>
 
+using namespace std;
+
+#include "Class.h"
+
 int main()
 {
     std::cout << "Hello World!\n";
