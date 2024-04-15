@@ -5,15 +5,17 @@
 
 using namespace std;
 
-#include "Class.h"
+#include "Class.h""
+#include "Pattern.h"
+#include <string>
 
 Avialiner::Avialiner()
 {
     if ((rand() % (100 - 0 + 1) + 100) < 87)
         NeedRepair = false;
     else NeedRepair = true;
-   // InFly = false;
-   // Fuel = 0;
+   InFly = false;
+    Fuel = 0;
     Company = aviacompany::Unknown;
     Type = LinerType::Unknown;
 }
@@ -45,13 +47,54 @@ Airport::~Airport()
 void Airport::AddPlane(Liner NewLiner)
 {
     LinerPark[avialinerCount++] = NewLiner;
+    avialinerCount++;
 }
 
+wstring PrintManufCompany(const ManufacturedCompany company)
+{
+    switch (company)
+    {
+    case ManufacturedCompany::Airbus: return  L"Airbus";
+    case ManufacturedCompany::Boeing: return  L"Boeing";
+    case ManufacturedCompany::Сухой: return  L"Сухой";
+    default: return L"неизвестный";
+    }
+};
+
+void vivod(Iterator<Liner> * it)
+{
+    
+    for (it->First(); !it->IsDone(); it->Next())
+    {
+        
+        const Liner currentLiner = it->GetCurrent();
+        wcout << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L")" << endl;
+    
+    }
+
+}
 
 
 int main()
 {
     setlocale(LC_ALL, "Russian");
+
+    Airport airportPark(5);
+
+    for (int i = 0; i < 5; i++)
+    {
+        airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260));
+        
+        //const Liner currentLiner = airportPark.GetByIndex(i);
+        //wcout << currentLiner->MaxAmountOfFuel() << endl;
+    }
+    
+ 
+    
+    Iterator<Liner>* it = airportPark.GetIterator();
+    vivod(it);
+    //wcout << L"да" << endl;
+
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
