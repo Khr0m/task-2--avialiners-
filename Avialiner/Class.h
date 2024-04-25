@@ -6,14 +6,14 @@
 #include "Pattern.h"
 #include <string>
 
-enum class LinerType : int
+enum class LinerType : int // тип лайнера
 {
 	грузовой,
 	пассажирский,
 	Unknown = -1
 };
 
-enum class aviacompany : int
+enum class aviacompany : int // компания владелец самолета
 {
 	Аэрофлот,
 	S7,
@@ -21,7 +21,7 @@ enum class aviacompany : int
 	Unknown = -1
 };
 
-enum class ManufacturedCompany : int
+enum class ManufacturedCompany : int // компания производитель
 {
 	Airbus,
 	Boeing,
@@ -31,7 +31,7 @@ enum class ManufacturedCompany : int
 
 //семейство объектов
 
-class Avialiner
+class Avialiner // основной родительский класс
 {
 protected:
 	bool NeedRepair; // нужел ди ремонт?
@@ -60,7 +60,9 @@ public:
 
 };
 
-typedef Avialiner * Liner;
+typedef Avialiner * LinerPtr; // ссылка на родительский класс
+
+// наследуемые классы
 
 class AirbusA320 : public Avialiner
 {
@@ -99,15 +101,15 @@ public:
 };
 
 
-
-class AirportIterator : public Iterator<Liner> //Итератор для первого контейнера
+// итератор для первого контейнера 
+class AirportIterator : public Iterator<LinerPtr> //Итератор для первого контейнера
 {
 private:
-	const Liner* LinerPark;
+	const LinerPtr* LinerPark;
 	int Pos;
 	int Count;
 public:
-	AirportIterator(const Liner* linerPark, int count)
+	AirportIterator(const LinerPtr* linerPark, int count)
 	{
 		LinerPark = linerPark;
 		Count = count;
@@ -116,50 +118,83 @@ public:
 
 	void First() { Pos = 0; }
 	void Next() { Pos++; }
-	bool IsDone() const { return Pos != Count; }
-	Liner GetCurrent() const { return LinerPark[Pos]; }
+	bool IsDone() const { return Pos == Count; }
+	LinerPtr GetCurrent() const { return LinerPark[Pos]; }
 };
 
-
+// первый контейнер(просто массив)
 
 class Airport // первый контейнер
 {
 private:
 	int avialinerCount;
 	int MaxSize;
-	Liner* LinerPark;
+	LinerPtr* LinerPark;
 
 public:
 	Airport(int size);
 	virtual ~Airport();
-	void AddPlane(Liner NewLiner);
+	void AddPlane(LinerPtr newLiner);
 	int GetCount() const { return avialinerCount; }
-	Liner GetByIndex(int index) const { return LinerPark[index]; }
+	LinerPtr GetByIndex(int index) const { return LinerPark[index]; }
 
-	Iterator<Liner>* GetIterator()
+	Iterator<LinerPtr>* GetIterator()
 	{
 		return new AirportIterator(LinerPark, avialinerCount);
 	}
 
 };
 
-/*
+// Итератор для второго контейнера
+
+class BigAirportIterator : public Iterator<LinerPtr>
+{
+private: 
+	const list<LinerPtr>* LinerPark;
+	list<LinerPtr>::const_iterator it;
+
+public:
+	BigAirportIterator(const list<LinerPtr>* linerPark)
+	{
+		LinerPark = linerPark;
+		it = LinerPark->begin();
+	}
+	void First() { it = LinerPark->begin(); }
+	void Next() { it++; }
+	bool IsDone() const { return it == LinerPark->end(); }
+	LinerPtr GetCurrent() const { return *it; }
+};
+
+
+
+//второй контейнер(list), надо дописать + итератор к нему
+
 class BigAirport // второй контейнер
 {
 private:
-	list<Liner> LinerPark;
+	list<LinerPtr> LinerPark;
 
 public:
-	void AddPlane(Liner NewLiner) { LinerPark.push_back(NewLiner); }
+	void AddPlane(LinerPtr newLiner) { LinerPark.push_back(newLiner); }
 	int GetCount() const { return LinerPark.size(); }
 
-	Iterator<Liner>* GetIterator()
+	Iterator<LinerPtr>* GetIterator()
 	{
-		//return new BigAirport(&LinerPark);
+		return new BigAirportIterator(&LinerPark);
 	};
 };
 
-*/
+
+//декораторы
+
+class AirportDecorator : public IteratorDecorator<LinerPtr>
+{
+private:
+
+public:
+	
+};
+
 
 
 #endif //ClassH

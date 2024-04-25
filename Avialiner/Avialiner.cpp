@@ -9,7 +9,7 @@ using namespace std;
 #include "Pattern.h"
 #include <string>
 
-Avialiner::Avialiner()
+Avialiner::Avialiner() // конструктор родительского класса
 {
     if ((rand() % (100 - 0 + 1) + 100) < 87)
         NeedRepair = false;
@@ -20,9 +20,9 @@ Avialiner::Avialiner()
     Type = LinerType::Unknown;
 }
 
-Airport::Airport(int maxSize)
+Airport::Airport(int maxSize) // конструктор контейнера
 {
-    LinerPark = new Liner[maxSize];
+    LinerPark = new LinerPtr[maxSize];
     for (int i = 0; i < maxSize; i++)
     {
         LinerPark[i] = NULL;
@@ -31,7 +31,7 @@ Airport::Airport(int maxSize)
     MaxSize = maxSize;
 }
 
-Airport::~Airport()
+Airport::~Airport() // деструктор контейнера
 {
     for (int i = 0; i < MaxSize; i++)
     {
@@ -44,13 +44,13 @@ Airport::~Airport()
     delete[] LinerPark;
 }
 
-void Airport::AddPlane(Liner NewLiner)
+void Airport::AddPlane(LinerPtr NewLiner) // добавление лайнера в контейнер
 {
     LinerPark[avialinerCount++] = NewLiner;
     avialinerCount++;
 }
 
-wstring PrintManufCompany(const ManufacturedCompany company)
+wstring PrintManufCompany(const ManufacturedCompany company) //функция для определения компаниии производителя
 {
     switch (company)
     {
@@ -61,14 +61,14 @@ wstring PrintManufCompany(const ManufacturedCompany company)
     }
 };
 
-void vivod(Iterator<Liner> * it)
+void vivod(Iterator<LinerPtr> * it) // функция для вывода компании производителя
 {
-    
+     
     for (it->First(); !it->IsDone(); it->Next())
     {
         
-        const Liner currentLiner = it->GetCurrent();
-        wcout << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L")" << endl;
+        const LinerPtr currentLiner = it->GetCurrent();
+        wcout << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L")" << endl;// ошибка памяти, при использовании 1 контейнера
     
     }
 
@@ -79,21 +79,33 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 
-    Airport airportPark(5);
+    Airport airportPark(7); // создание первого контейнера
 
-    for (int i = 0; i < 5; i++)
+    //BigAirport airportPark;
+
+    for (int i = 0; i < 5; i++) // добавление в контейнер самолетов
     {
-        airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260));
+        airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260)); 
+       
         
         //const Liner currentLiner = airportPark.GetByIndex(i);
         //wcout << currentLiner->MaxAmountOfFuel() << endl;
     }
+
+    for (int i = 0; i < 2; i++) // добавление в контейнер самолетов
+    {
+        airportPark.AddPlane(new Boeing737(aviacompany::S7, LinerType::пассажирский, 260));
+
+    }
     
  
     
-    Iterator<Liner>* it = airportPark.GetIterator();
-    vivod(it);
+    Iterator<LinerPtr>* it = airportPark.GetIterator(); // создание итератора
+    vivod(it);// пытаюсь вывести компанию производитель, не работает
     //wcout << L"да" << endl;
+
+    delete it;
+    return 0;
 
 }
 
