@@ -2,6 +2,7 @@
 #ifndef PatternH
 #define PatternH
 
+#include "Class.h"
 
 template<class Type> //итератор
 class Iterator
@@ -37,5 +38,8 @@ public:
     virtual bool IsDone() const { return It->IsDone(); }
     virtual Type GetCurrent() const { return It->GetCurrent(); }
 };
+
+
+
 
 #endif //PatternH

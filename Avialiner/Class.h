@@ -34,8 +34,8 @@ enum class ManufacturedCompany : int // компания производитель
 class Avialiner // основной родительский класс
 {
 protected:
-	bool NeedRepair; // нужел ди ремонт?
-	bool InFly; // находится ли лайнер в полете
+	bool NeedRepair; // нужел ли ремонт
+	bool InFly = false; // находится ли лайнер в полете
 	int Fuel; // топливо
 	int maxFuel; // максимальное топливо
 	aviacompany Company;// компания владелец
@@ -53,10 +53,24 @@ public:
 	LinerType GetType() const { return Type; }
 	aviacompany GetCompany() const { return Company;  }
 	void Repairing() { NeedRepair = false; wcout << L"Самолет починен" << endl;}
-	void FillUp(int fuel) { Fuel = fuel;  wcout << L"Самолет заправлен на " << Fuel << L" литров" << endl; };
+	void FillUp(int fuel) 
+	{ 
+		  
+		if (Fuel + fuel < maxFuel)
+		{
+			wcout << L"Самолет заправлен на " << fuel << L" литров" << endl;
+			Fuel += fuel;
+		}
+		else
+		{
+			wcout << L"Самолет заправлен на " << maxFuel -Fuel << L" литров" << endl;
+			Fuel = maxFuel;
+		}
+
+	};
 	virtual void Takeoff(int Speed) = 0;
 	virtual  ManufacturedCompany GetManufCompany() const = 0;
-
+	static Avialiner* Create(aviacompany company, LinerType type, int takeoffSpeed, ManufacturedCompany manufCompany);
 
 };
 
@@ -67,7 +81,7 @@ typedef Avialiner * LinerPtr; // ссылка на родительский класс
 class AirbusA320 : public Avialiner
 {
 public:
-	AirbusA320(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed;  }
+	AirbusA320(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed;  maxFuel = 300; }
 	void Takeoff(int speed) { 
 		if((AmountOfFuel() >= 0.8 * maxFuel) and (speed = TakeoffSpeed) and (IsNeedRepair()))
 			wcout << "Самолет взлетел" << endl; 
@@ -79,7 +93,7 @@ public:
 class Boeing737 : public Avialiner
 {
 public:
-	Boeing737(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed; }
+	Boeing737(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed; maxFuel = 350; }
 	void Takeoff(int speed) {
 		if ((AmountOfFuel() >= 0.8 * maxFuel) and (speed = TakeoffSpeed) and (IsNeedRepair()))
 			wcout << "Самолет взлетел" << endl;
@@ -91,7 +105,7 @@ public:
 class Superjet100 : public Avialiner
 {
 public:
-	Superjet100(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed; }
+	Superjet100(aviacompany company, LinerType type, int takeoffSpeed) : Avialiner() { Company = company; Type = type; TakeoffSpeed = takeoffSpeed; maxFuel = 200; }
 	void Takeoff(int speed) {
 		if ((AmountOfFuel() >= 0.8 * maxFuel) and (speed = TakeoffSpeed) and (IsNeedRepair()))
 			wcout << "Самолет взлетел" << endl;
@@ -187,12 +201,86 @@ public:
 
 //декораторы
 
-class AirportDecorator : public IteratorDecorator<LinerPtr>
+class LinerNeedRepairIteratorDecorator : public IteratorDecorator<LinerPtr> // по необходимости ремонта
 {
 private:
-
+	bool TargetNeedRepair;
 public:
-	
+	LinerNeedRepairIteratorDecorator(Iterator<LinerPtr>* it, bool targetNeedRepair) : IteratorDecorator(it)
+	{
+		TargetNeedRepair = targetNeedRepair;
+	}
+	void First()
+	{
+		It->First();
+		while (!It->IsDone() && It->GetCurrent()->IsNeedRepair() != TargetNeedRepair)
+		{
+			It->Next();
+		}
+	}
+	void Next()
+	{
+		do
+		{
+			It->Next();
+		} while (!It->IsDone() && It->GetCurrent()->IsNeedRepair() != TargetNeedRepair);
+
+	}
+};
+
+
+class LinerNotInFlyIteratorDecorator : public IteratorDecorator<LinerPtr> // по нахождению в полете
+{
+private:
+	bool TargetNotInFly;
+public:
+	LinerNotInFlyIteratorDecorator(Iterator<LinerPtr>* it, bool targetNotInFly) : IteratorDecorator(it)
+	{
+		TargetNotInFly = targetNotInFly;
+	}
+	void First()
+	{
+		It->First();
+		while (!It->IsDone() && It->GetCurrent()->IsInFly() != TargetNotInFly)
+		{
+			It->Next();
+		}
+	}
+	void Next()
+	{
+		do
+		{
+			It->Next();
+		} while (!It->IsDone() && It->GetCurrent()->IsInFly() != TargetNotInFly);
+
+	}
+};
+
+class LinerCompany : public IteratorDecorator<LinerPtr> // по компании
+{
+private:
+	aviacompany TargetCompany;
+public:
+	LinerCompany(Iterator<LinerPtr>* it, aviacompany targetCompany) : IteratorDecorator(it)
+	{
+		TargetCompany = targetCompany;
+	}
+	void First()
+	{
+		It->First();
+		while (!It->IsDone() && It->GetCurrent()->GetCompany() != TargetCompany)
+		{
+			It->Next();
+		}
+	}
+	void Next()
+	{
+		do
+		{
+			It->Next();
+		} while (!It->IsDone() && It->GetCurrent()->GetCompany() != TargetCompany);
+
+	}
 };
 
 

@@ -5,16 +5,17 @@
 
 using namespace std;
 
-#include "Class.h""
+#include "Class.h"
 #include "Pattern.h"
 #include <string>
 
+
 Avialiner::Avialiner() // конструктор родительского класса
 {
-    if ((rand() % (100 - 0 + 1) + 100) < 87)
+    if ((rand() % (100 - 0 + 1) + 0) < 87)
         NeedRepair = false;
     else NeedRepair = true;
-   InFly = false;
+    InFly = false;
     Fuel = 0;
     Company = aviacompany::Unknown;
     Type = LinerType::Unknown;
@@ -46,8 +47,9 @@ Airport::~Airport() // деструктор контейнера
 
 void Airport::AddPlane(LinerPtr NewLiner) // добавление лайнера в контейнер
 {
-    LinerPark[avialinerCount++] = NewLiner;
+    LinerPark[avialinerCount] = NewLiner;
     avialinerCount++;
+    
 }
 
 wstring PrintManufCompany(const ManufacturedCompany company) //функция для определения компаниии производителя
@@ -61,51 +63,131 @@ wstring PrintManufCompany(const ManufacturedCompany company) //функция д
     }
 };
 
-void vivod(Iterator<LinerPtr> * it) // функция для вывода компании производителя
+wstring PrintAviaCompany(const aviacompany company) //функция для определения компаниии производителя
 {
+    switch (company)
+    {
+    case aviacompany::Аэрофлот: return  L"Аэрофлот";
+    case aviacompany::S7: return  L"S7";
+    case aviacompany::Победа: return  L"Победа";
+    default: return L"неизвестный";
+    }
+};
+
+void ViewManufCompany(Iterator<LinerPtr> * it) // функция для вывода компании производителя
+{
+    int i = 0;
      
     for (it->First(); !it->IsDone(); it->Next())
     {
         
         const LinerPtr currentLiner = it->GetCurrent();
-        wcout << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L")" << endl;// ошибка памяти, при использовании 1 контейнера
+        i++;
+        wcout << i << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L")" << endl;
+        
     
     }
 
 }
 
+void ViewCharacteristics(Iterator<LinerPtr>* it) // функция для вывода зарактеристик
+{
+    int i = 0;
+
+    for (it->First(); !it->IsDone(); it->Next())
+    {
+        i++;
+        const LinerPtr currentLiner = it->GetCurrent();
+
+        wcout << i << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L") ";
+        wcout << L" (" << PrintAviaCompany(currentLiner->GetCompany()) << L") ";
+        wcout << L" (" << currentLiner->AmountOfFuel() << L") ";
+        if (currentLiner->IsNeedRepair() == 0)
+        {
+            wcout << L" (" << L"Ремонт не нужен" << L")" << endl;
+        }
+        else
+        {
+            wcout << L" (" << L"Ремонт нужен" << L")" << endl;
+        }
+       
+
+    }
+}
+
+// Фабричный метод
+Avialiner* CreateLiner(aviacompany company, LinerType type, int takeoffSpeed, ManufacturedCompany manufCompany) 
+{
+    switch (manufCompany)
+    {
+    case ManufacturedCompany::Airbus: return  new AirbusA320(company, type, takeoffSpeed);
+    case ManufacturedCompany::Boeing: return  new Boeing737(company, type,  takeoffSpeed);
+    case ManufacturedCompany::Сухой: return new Superjet100(company, type, takeoffSpeed);
+    default: return NULL;
+    }
+}
+
+Avialiner* Avialiner::Create(aviacompany company, LinerType type, int takeoffSpeed, ManufacturedCompany manufCompany)
+{
+    return CreateLiner(company, type, takeoffSpeed, manufCompany);
+}
 
 int main()
 {
     setlocale(LC_ALL, "Russian");
 
-    Airport airportPark(7); // создание первого контейнера
 
-    //BigAirport airportPark;
+    Airport airportPark(16); // создание контейнера первого типа
 
-    for (int i = 0; i < 5; i++) // добавление в контейнер самолетов
+    //BigAirport airportPark; // создание контейнера вторго типа
+
+
+    // добавление в контейнер самолетов
+    for (int i = 0; i < 5; i++) 
     {
-        airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260)); 
-       
-        
-        //const Liner currentLiner = airportPark.GetByIndex(i);
-        //wcout << currentLiner->MaxAmountOfFuel() << endl;
+        //airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260)); 
+        airportPark.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 260, ManufacturedCompany::Boeing));
     }
 
     for (int i = 0; i < 2; i++) // добавление в контейнер самолетов
     {
-        airportPark.AddPlane(new Boeing737(aviacompany::S7, LinerType::пассажирский, 260));
+        //airportPark.AddPlane(new Boeing737(aviacompany::S7, LinerType::пассажирский, 260)); //создание объекта через его добавление
+        airportPark.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 260, ManufacturedCompany::Boeing)); // создание объекта через фабричный метод
 
     }
+    for (int i = 0; i < 4; i++) // добавление в контейнер самолетов
+    {
+       // airportPark.AddPlane(new AirbusA320(aviacompany::S7, LinerType::пассажирский, 270));
+        airportPark.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 270, ManufacturedCompany::Airbus));
+    }
+    for (int i = 0; i < 5; i++) // добавление в контейнер самолетов
+    {
+        // airportPark.AddPlane(new Superjet100(aviacompany::Аэрофлот, LinerType::пассажирский, 270));
+        airportPark.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 230, ManufacturedCompany::Сухой));
+    }
+
     
  
     
     Iterator<LinerPtr>* it = airportPark.GetIterator(); // создание итератора
-    vivod(it);// пытаюсь вывести компанию производитель, не работает
-    //wcout << L"да" << endl;
 
+    wcout << L"Вывод компаний производителей самолетов" << endl;
+    ViewManufCompany(it);
+    wcout << endl << endl;
+    wcout <<  L"Вывод всех лайнеров c их характеристиками" << endl;
+    ViewCharacteristics(it);
+    wcout << endl << endl;
+
+    wcout << L"Вывод всех лайнеров компании S7, не нуждающиеся в ремонте и не в полете, с использованием декораторов" << endl;
+    Iterator<LinerPtr>* decorIterator = new LinerNeedRepairIteratorDecorator(new LinerNotInFlyIteratorDecorator(new LinerCompany(airportPark.GetIterator(), aviacompany::S7), false), false);
+    ViewCharacteristics(decorIterator);
+
+    // удаление итераторов
     delete it;
+    delete decorIterator;
     return 0;
+
+    //wcout << L"да" << endl; // инструмент отладки
 
 }
 
