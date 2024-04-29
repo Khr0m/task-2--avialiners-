@@ -101,7 +101,7 @@ void ViewCharacteristics(Iterator<LinerPtr>* it) // функция для выв
 
         wcout << i << L" (" << PrintManufCompany(currentLiner->GetManufCompany()) << L") ";
         wcout << L" (" << PrintAviaCompany(currentLiner->GetCompany()) << L") ";
-        wcout << L" (" << currentLiner->AmountOfFuel() << L") ";
+        wcout << L" в баке (" << currentLiner->AmountOfFuel() << L") литров топлива ";
         if (currentLiner->IsNeedRepair() == 0)
         {
             wcout << L" (" << L"Ремонт не нужен" << L")" << endl;
@@ -136,31 +136,35 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 
+    int liner1 = rand() % (20 - 0 + 1) + 0;
+    int liner2 = rand() % (20 - 0 + 1) + 0;
+    int liner3 = rand() % (20 - 0 + 1) + 0;
+    int liner4 = rand() % (20 - 0 + 1) + 0;
 
-    Airport airportPark(16); // создание контейнера первого типа
+    Airport airportPark(liner1 + liner2 + liner3 + liner4); // создание контейнера первого типа
 
     //BigAirport airportPark; // создание контейнера вторго типа
 
 
     // добавление в контейнер самолетов
-    for (int i = 0; i < 5; i++) 
+    for (int i = 0; i < liner1; i++)
     {
         //airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260)); 
         airportPark.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 260, ManufacturedCompany::Boeing));
     }
 
-    for (int i = 0; i < 2; i++) // добавление в контейнер самолетов
+    for (int i = 0; i < liner2; i++) // добавление в контейнер самолетов
     {
         //airportPark.AddPlane(new Boeing737(aviacompany::S7, LinerType::пассажирский, 260)); //создание объекта через его добавление
         airportPark.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 260, ManufacturedCompany::Boeing)); // создание объекта через фабричный метод
 
     }
-    for (int i = 0; i < 4; i++) // добавление в контейнер самолетов
+    for (int i = 0; i < liner3; i++) // добавление в контейнер самолетов
     {
        // airportPark.AddPlane(new AirbusA320(aviacompany::S7, LinerType::пассажирский, 270));
         airportPark.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 270, ManufacturedCompany::Airbus));
     }
-    for (int i = 0; i < 5; i++) // добавление в контейнер самолетов
+    for (int i = 0; i < liner4; i++) // добавление в контейнер самолетов
     {
         // airportPark.AddPlane(new Superjet100(aviacompany::Аэрофлот, LinerType::пассажирский, 270));
         airportPark.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 230, ManufacturedCompany::Сухой));
@@ -171,9 +175,9 @@ int main()
     
     Iterator<LinerPtr>* it = airportPark.GetIterator(); // создание итератора
 
-    wcout << L"Вывод компаний производителей самолетов" << endl;
-    ViewManufCompany(it);
-    wcout << endl << endl;
+    //wcout << L"Вывод компаний производителей самолетов" << endl;
+   // ViewManufCompany(it);
+    //wcout << endl << endl;
     wcout <<  L"Вывод всех лайнеров c их характеристиками" << endl;
     ViewCharacteristics(it);
     wcout << endl << endl;
