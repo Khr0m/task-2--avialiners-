@@ -5,6 +5,7 @@
 #include <list>
 #include "Pattern.h"
 #include <string>
+#include "sqlite3.h"
 
 enum class LinerType : int // тип лайнера
 {
@@ -181,7 +182,7 @@ public:
 
 
 
-//второй контейнер(list), надо дописать + итератор к нему
+//второй контейнер(list)
 
 class BigAirport // второй контейнер
 {
@@ -198,6 +199,39 @@ public:
 	};
 };
 
+//итератор для 3 контейнера
+
+class BDAirporttIterator : public Iterator<LinerPtr>
+{
+private:
+	sqlite3* LinerPark;
+	int Pos = 1;
+public:
+	BDAirporttIterator(sqlite3* linerPark) { LinerPark = linerPark; }
+	void First() { Pos = 1; }
+	void Next() { Pos++; }
+	bool IsDone() const;
+	LinerPtr GetCurrent() const;
+};
+
+//третий контейнер(SQLite)
+
+class BDAirport
+{
+private:
+	sqlite3* LinerPark;
+
+public:
+	void AddPlane(LinerPtr newLiner);
+	int GetCount() const;
+	BDAirport();
+	~BDAirport();
+
+	Iterator<LinerPtr>* GetIterator()
+	{
+		return new BDAirporttIterator(LinerPark);
+	};
+};
 
 //декораторы
 

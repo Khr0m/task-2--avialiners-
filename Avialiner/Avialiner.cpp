@@ -8,6 +8,8 @@ using namespace std;
 #include "Class.h"
 #include "Pattern.h"
 #include <string>
+#include "sqlite3.h"
+#include "bdfunc.h"
 
 
 Avialiner::Avialiner() // конструктор родительского класса
@@ -141,9 +143,11 @@ int main()
     int liner3 = rand() % (20 - 0 + 1) + 0;
     int liner4 = rand() % (20 - 0 + 1) + 0;
 
-    Airport airportPark(liner1 + liner2 + liner3 + liner4); // создание контейнера первого типа
+    //Airport airportPark(liner1 + liner2 + liner3 + liner4); // создание контейнера первого типа
 
-    //BigAirport airportPark; // создание контейнера вторго типа
+    BigAirport airportPark; // создание контейнера вторго типа
+
+    
 
 
     // добавление в контейнер самолетов
@@ -178,7 +182,7 @@ int main()
     //wcout << L"Вывод компаний производителей самолетов" << endl;
    // ViewManufCompany(it);
     //wcout << endl << endl;
-    wcout <<  L"Вывод всех лайнеров c их характеристиками" << endl;
+    wcout <<  L"Вывод всех лайнеров с их характеристиками" << endl;
     ViewCharacteristics(it);
     wcout << endl << endl;
 
@@ -189,6 +193,65 @@ int main()
     // удаление итераторов
     delete it;
     delete decorIterator;
+
+
+    wcout << endl << endl;
+    wcout << endl << endl;
+
+    BDAirport airportPark1;
+
+
+    for (int i = 0; i < liner1; i++)
+    {
+        //airportPark.AddPlane(new Boeing737(aviacompany::Аэрофлот, LinerType::пассажирский, 260)); 
+        airportPark1.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 260, ManufacturedCompany::Boeing));
+    }
+
+    for (int i = 0; i < liner2; i++) // добавление в контейнер самолетов
+    {
+        //airportPark.AddPlane(new Boeing737(aviacompany::S7, LinerType::пассажирский, 260)); //создание объекта через его добавление
+        airportPark1.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 260, ManufacturedCompany::Boeing)); // создание объекта через фабричный метод
+
+    }
+    for (int i = 0; i < liner3; i++) // добавление в контейнер самолетов
+    {
+        // airportPark.AddPlane(new AirbusA320(aviacompany::S7, LinerType::пассажирский, 270));
+        airportPark1.AddPlane(CreateLiner(aviacompany::S7, LinerType::пассажирский, 270, ManufacturedCompany::Airbus));
+    }
+    for (int i = 0; i < liner4; i++) // добавление в контейнер самолетов
+    {
+        // airportPark.AddPlane(new Superjet100(aviacompany::Аэрофлот, LinerType::пассажирский, 270));
+        airportPark1.AddPlane(CreateLiner(aviacompany::Аэрофлот, LinerType::пассажирский, 230, ManufacturedCompany::Сухой));
+    }
+
+
+
+
+    Iterator<LinerPtr>* it1 = airportPark1.GetIterator(); // создание итератора
+
+    //wcout << L"Вывод компаний производителей самолетов" << endl;
+   // ViewManufCompany(it);
+    //wcout << endl << endl;
+    wcout << L"             Вывод через базу данных" << endl;
+    wcout << endl << endl;
+    wcout << L"Вывод всех лайнеров с их характеристиками" << endl;
+    ViewCharacteristics(it1);
+    wcout << endl << endl;
+    wcout << L"Вывод всех лайнеров компании S7, не нуждающиеся в ремонте и не в полете, с использованием декораторов" << endl;
+    Iterator<LinerPtr>* decorIterator1 = new LinerNeedRepairIteratorDecorator(new LinerNotInFlyIteratorDecorator(new LinerCompany(airportPark.GetIterator(), aviacompany::S7), false), false);
+    ViewCharacteristics(decorIterator1);
+    
+
+    // удаление итераторов
+
+    delete it1;
+    delete decorIterator1;
+
+    //закрытие бд
+    //airportPark1.~BDAirport(); деструктор вызывается автоматически при удалении контейнера
+
+    
+
     return 0;
 
     //wcout << L"да" << endl; // инструмент отладки
